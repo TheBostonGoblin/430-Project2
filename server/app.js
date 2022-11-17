@@ -14,6 +14,8 @@ const csrf = require('csurf');
 
 const router = require('./router.js');
 
+const socketSetup = require('./io.js');
+
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const dbURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1/DomoMaker';
@@ -45,7 +47,7 @@ app.use(compression());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.use(session({
+const sessionMiddleware = session({
   key: 'sessionid',
   store: new RedisStore({
     client: redisClient,
@@ -56,7 +58,9 @@ app.use(session({
   cookie: {
     httpOnly: true,
   },
-}));
+});
+
+app.use(sessionMiddleware);
 
 app.engine('handlebars', expressHandlebars.engine({ defaultLayout: '' }));
 app.set('view engine', 'handlebars');
@@ -73,7 +77,9 @@ app.use((err, req, res, next) => {
 
 router(app);
 
-app.listen(port, (err) => {
+const server = socketSetup(app,sessionMiddleware);
+
+server.listen(port, (err) => {
   if (err) { throw err; }
   console.log(`Listening on port ${port}`);
 });

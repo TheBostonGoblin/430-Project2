@@ -1,5 +1,6 @@
 const helper = require('./helper.js');
 let csrfToken;
+var socket = io();
 const handleDomo = (e) =>{
     e.preventDefault();
     helper.hideError();
@@ -18,7 +19,7 @@ const handleDomo = (e) =>{
     helper.sendPost(e.target.action, {name,age,level,_csrf}, loadDomosFromServer);
     return false;
 }
-const handleUpdateDomo = (e) =>{
+const handleUpdateDomo = (e) => {
     e.preventDefault();
     helper.hideError();
 
@@ -137,6 +138,8 @@ const loadDomosFromServer = async () => {
 }
 
 const init = async () => {
+
+    console.log(`socket is : ${socket}`);
     const response = await fetch('/getToken');
     const data = await response.json();
     csrfToken = data.csrfToken;
