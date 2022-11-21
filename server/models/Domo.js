@@ -3,24 +3,40 @@ const _ = require('underscore');
 
 let DomoModel = {};
 
-const setName = (name) => _.escape(name).trim();
+const setName = (dishName) => _.escape(dishName).trim();
+
+// dishName: newDomo.dishName, nutri: newDomo.nutri, ingre: newDomo.ingre, image: newDomo.image, level: newDomo.level
 
 const DomoSchema = new mongoose.Schema({
-  name: {
+  dishName: {
     type: String,
     require: true,
     trim: true,
     set: setName,
   },
-  age: {
-    type: Number,
-    min: 0,
+  nutri: {
+    type: String,
     require: true,
   },
-  level: {
+  ingre: {
+    type: String,
+    require: true,
+  },
+  image: {
+    type: Buffer,
+    contentType: String,
+  },
+  likes: {
     type: Number,
-    min: 0,
-    max: 100,
+    require: true,
+    min: 0
+  },
+  likedBy: {
+    type: Array,
+    require: true,
+  },
+  hasLiked: {
+    type: Boolean,
     require: true,
   },
   owner: {
@@ -35,9 +51,13 @@ const DomoSchema = new mongoose.Schema({
 });
 
 DomoSchema.static.toAPI = (doc) => ({
-  name: doc.name,
-  age: doc.age,
-  level: doc.level,
+  dishName: doc.dishName,
+  nutri: doc.nutri,
+  ingre: doc.ingre,
+  image: doc.image,
+  likes: doc.likes,
+  likedBy: doc.likedBy,
+  hasLiked: doc.hasLiked
 });
 
 DomoSchema.statics.findByOwner = (ownerId, callback) => {
@@ -45,7 +65,7 @@ DomoSchema.statics.findByOwner = (ownerId, callback) => {
     owner: mongoose.Types.ObjectId(ownerId),
   };
 
-  return DomoModel.find(search).select('name age level').lean().exec(callback);
+  return DomoModel.find(search).select('dishName nutri ingre image likes likedBy hasLiked').lean().exec(callback);
 };
 
 DomoModel = mongoose.model('Domo', DomoSchema);
