@@ -4,7 +4,7 @@ const mid = require('./middleware');
 const router = (app) => {
   app.get('/getToken', mid.requiresSecure, controllers.Account.getToken);
   app.get('/getMyPost', mid.requiresLogin, controllers.Domo.getMyPost);
-  app.get('/getAllPosts',mid.requiresLogin, controllers.Domo.getAllPost);
+  app.get('/getAllPosts', mid.requiresLogin, controllers.Domo.getAllPost);
 
   app.get('/login', mid.requiresSecure, mid.requiresLogout, controllers.Account.loginPage);
   app.post('/login', mid.requiresSecure, mid.requiresLogout, controllers.Account.login);
@@ -16,12 +16,12 @@ const router = (app) => {
   app.get('/maker', mid.requiresLogin, controllers.Domo.makerPage);
   app.post('/maker', mid.requiresLogin, controllers.Domo.makePost);
 
-  app.get('/profile',mid.requiresLogin, controllers.Domo.profilePage)
+  app.get('/profile', mid.requiresLogin, controllers.Domo.profilePage);
 
-  app.post('/upload', mid.requiresLogin, controllers.fileControl.uploadFile)
+  app.post('/upload', mid.requiresLogin, controllers.fileControl.uploadFile);
 
   app.post('/like', mid.requiresLogin, controllers.Domo.likePost);
-  app.post('/unlike',mid.requiresLogin, controllers.Domo.unlikePost);
+  app.post('/unlike', mid.requiresLogin, controllers.Domo.unlikePost);
 
   app.post('/delete', mid.requiresLogin, controllers.Domo.removePost);
 

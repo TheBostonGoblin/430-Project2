@@ -5,8 +5,6 @@ let DomoModel = {};
 
 const setName = (dishName) => _.escape(dishName).trim();
 
-// dishName: newDomo.dishName, nutri: newDomo.nutri, ingre: newDomo.ingre, image: newDomo.image, level: newDomo.level
-
 const DomoSchema = new mongoose.Schema({
   dishName: {
     type: String,
@@ -29,7 +27,7 @@ const DomoSchema = new mongoose.Schema({
   likes: {
     type: Number,
     require: true,
-    min: 0
+    min: 0,
   },
   likedBy: {
     type: Array,
@@ -57,7 +55,7 @@ DomoSchema.static.toAPI = (doc) => ({
   image: doc.image,
   likes: doc.likes,
   likedBy: doc.likedBy,
-  hasLiked: doc.hasLiked
+  hasLiked: doc.hasLiked,
 });
 
 DomoSchema.statics.findByOwner = (ownerId, callback) => {

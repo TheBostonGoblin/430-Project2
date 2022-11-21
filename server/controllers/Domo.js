@@ -1,107 +1,42 @@
-const { identity } = require('underscore');
 const models = require('../models');
 const DomoModel = require('../models/Domo');
-const File = require('../models/storeFile.js');
-
 
 const { Domo } = models;
 
-const uploadFile = async (req, res) => {
-  if (!req.body.image) {
-    return res.status(400).json({ error: 'No files were uploaded' });
-  }
-
-  const { sampleFile } = req.body.image;
-
-  const imageData = {
-    image: req.body.image,
-    id: req.body._id
-  }
-
-  try {
-    const newFile = new File(imageData);
-    const doc = await newFile.save();
-    return res.status(201).json({
-      message: 'The Image/Recipe was sucessfully uploaded',
-      fileId: doc._id
-    });
-  } catch (err) {
-    console.log(err);
-    return res.status(400).json({
-      error: 'Error occured while uploaded file',
-    });
-  }
-
-
-}
-
-const retrieveFile = async (req, res) => {
-
-  if (!req.query._id) {
-    return res.status(400).json({ error: 'Missing file id!' });
-  }
-
-  let doc;
-  try {
-    // First we attempt to find the file by the _id sent by the user.
-    doc = await File.findOne({ _id: req.query._id }).exec();
-  } catch (err) {
-    // If we have an error contacting the database, let the user know something happened.
-    console.log(err);
-    return res.status(400).json({ error: 'Something went wrong retrieving file!' });
-  }
-
-  if (!doc) {
-    return res.status(404).json({ error: 'File not found!' });
-  }
-
-  res.set({
-    'Content-Type': doc.mimetype,
-    'Content-Length': doc.size,
-    'Content-Disposition': `filename="${doc.name}"`
-  });
-
-  return res.send(doc.data);
-}
-
 const makerPage = (req, res) => res.render('app');
 
-const profilePage = (req,res) => res.render('profile');
+const profilePage = (req, res) => res.render('profile');
 
 const getMyPost = (req, res) => DomoModel.findByOwner(req.session.account._id, (err, docs) => {
   if (err) {
     console.log(err);
     return res.stauts(400).json({ error: 'An error occured!' });
   }
-  //await DomoModel.findByIdAndUpdate(req.body.domoID, { $set: { hasLiked: recipeLikedBy.includes(req.session.account.username) } }).exec();
   console.log(req.session.account);
   const test = docs;
 
   console.log(test);
   return res.json({ domos: docs });
 });
-
 const getAllPost = (req, res) => DomoModel.find({}, (err, docs) => {
   if (err) {
     console.log(err);
     return res.stauts(400).json({ error: 'An error occured!' });
   }
 
-  const recipes = docs;
-  recipes.forEach(recipe => {
-    recipe._doc.hasLiked = recipe._doc.likedBy.includes(req.session.account.username);
+  docs.forEach((recipe) => {
+    recipe.hasLiked = recipe._doc.likedBy.includes(req.session.account.username);
   });
-
-  docs = recipes;
 
   return res.json({ domos: docs });
 });
 
 const makePost = async (req, res) => {
-
-
-
-  if (!req.body.dishName || !req.body.nutri || !req.body.ingre || !req.body.image || !req.body.likes) {
+  if (!req.body.dishName
+    || !req.body.nutri
+    || !req.body.ingre
+    || !req.body.image
+    || !req.body.likes) {
     return res.status(400).json({ error: 'Name, level, and age are required!' });
   }
 
@@ -115,8 +50,6 @@ const makePost = async (req, res) => {
     hasLiked: req.body.hasLiked,
     owner: req.session.account._id,
   };
-
- 
 
   // try {
   //   const newFile = new File(sampleFile);
@@ -132,11 +65,18 @@ const makePost = async (req, res) => {
   //   });
   // }
 
-
   try {
     const newDomo = new Domo(domoData);
     await newDomo.save();
-    return res.status(201).json({ dishName: newDomo.dishName, nutri: newDomo.nutri, ingre: newDomo.ingre, image: newDomo.image, likes: newDomo.likes, likedBy: newDomo.likedBy, hasLiked: newDomo.hasLiked });
+    return res.status(201).json({
+      dishName: newDomo.dishName,
+      nutri: newDomo.nutri,
+      ingre: newDomo.ingre,
+      image: newDomo.image,
+      likes: newDomo.likes,
+      likedBy: newDomo.likedBy,
+      hasLiked: newDomo.hasLiked,
+    });
   } catch (err) {
     console.log(err);
 
@@ -145,61 +85,66 @@ const makePost = async (req, res) => {
     }
     return res.status(400).json({ error: 'An error occured' });
   }
-
-  
 };
 
 const unlikePost = async (req, res) => {
-
   try {
     await DomoModel.findByIdAndUpdate(req.body.domoID, { $pull: { likedBy: `${req.session.account.username}` } }).exec();
     let likedByArray;
 
-    let recipes = await DomoModel.find({});
-
-    let recipeId = recipes[0]._doc._id.toString();
-
+    const recipes = await DomoModel.find({});
     let testText;
 
-    recipes.forEach(recipe => {
+    recipes.forEach((recipe) => {
       if (recipe._doc._id.toString() === req.body.domoID) {
         likedByArray = recipe._doc.likedBy;
-        testText = "id found";
+        testText = 'id found';
       }
     });
 
     console.log(testText);
-    await DomoModel.findByIdAndUpdate(req.body.domoID, { $set: { likes: likedByArray.length } }).exec();
-    await DomoModel.findByIdAndUpdate(req.body.domoID, { $set: { hasLiked: likedByArray.includes(req.session.account.username) } }).exec();
+    await DomoModel.findByIdAndUpdate(
+      req.body.domoID,
+      { $set: { likes: likedByArray.length } },
+    ).exec();
+
+    await DomoModel.findByIdAndUpdate(
+      req.body.domoID,
+
+      { $set: { hasLiked: likedByArray.includes(req.session.account.username) } },
+
+    ).exec();
   } catch (err) {
     return res.status(500).json({ message: 'Failed to update Domo' });
   }
 
   return res.status(200).json({});// technically this is a 204 status
-
-}
+};
 const likePost = async (req, res) => {
-
   try {
     await DomoModel.findByIdAndUpdate(req.body.domoID, { $push: { likedBy: `${req.session.account.username}` } }).exec();
     let likedByArray;
 
-    let recipes = await DomoModel.find({});
-
-    let recipeId = recipes[0]._doc._id.toString();
+    const recipes = await DomoModel.find({});
 
     let testText;
 
-    recipes.forEach(recipe => {
+    recipes.forEach((recipe) => {
       if (recipe._doc._id.toString() === req.body.domoID) {
         likedByArray = recipe._doc.likedBy;
-        testText = "id found";
+        testText = 'id found';
       }
     });
 
     console.log(testText);
-    await DomoModel.findByIdAndUpdate(req.body.domoID, { $set: { likes: likedByArray.length } }).exec();
-    await DomoModel.findByIdAndUpdate(req.body.domoID, { $set: { hasLiked: likedByArray.includes(req.session.account.username) } }).exec();
+    await DomoModel.findByIdAndUpdate(
+      req.body.domoID,
+      { $set: { likes: likedByArray.length } },
+    ).exec();
+    await DomoModel.findByIdAndUpdate(
+      req.body.domoID,
+      { $set: { hasLiked: likedByArray.includes(req.session.account.username) } },
+    ).exec();
   } catch (err) {
     return res.status(500).json({ message: 'Failed to update Domo' });
   }
@@ -225,5 +170,5 @@ module.exports = {
   unlikePost,
   removePost,
   getAllPost,
-  profilePage
+  profilePage,
 };

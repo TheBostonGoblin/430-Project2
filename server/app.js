@@ -13,14 +13,13 @@ const RedisStore = require('connect-redis')(session);
 const redis = require('redis');
 const csrf = require('csurf');
 
-
 const router = require('./router.js');
 
 const socketSetup = require('./io.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
-const dbURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1/DomoMaker';
+const dbURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1/Gobble';
 
 mongoose.connect(dbURI, (err) => {
   if (err) {
@@ -49,7 +48,6 @@ app.use(bodyParser.json());
 app.use('/assets', express.static(path.resolve(`${__dirname}/../hosted/`)));
 app.use(favicon(`${__dirname}/../hosted/img/favicon.png`));
 app.use(compression());
-
 
 const sessionMiddleware = session({
   key: 'sessionid',
@@ -82,7 +80,7 @@ app.use((err, req, res, next) => {
 
 router(app);
 
-const server = socketSetup(app,sessionMiddleware);
+const server = socketSetup(app, sessionMiddleware);
 
 server.listen(port, (err) => {
   if (err) { throw err; }
