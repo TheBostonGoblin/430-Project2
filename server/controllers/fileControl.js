@@ -1,3 +1,4 @@
+const { Domo } = require('../models/index.js');
 const File = require('../models/storeFile.js');
 
 const uploadPage = (req, res) => {
@@ -5,11 +6,26 @@ const uploadPage = (req, res) => {
 };
 
 const uploadFile = async (req, res) => {
-  if (!req.files || !req.files.sampleFile) {
+  if (!req.files || !req.files.image) {
     return res.status(400).json({ error: 'No files were uploaded' });
   }
 
   try {
+    const image = new File(req.files.image);
+
+    const doc = await image.save();
+
+    const recipe = {
+      image: doc._id,
+      dishName: req.body.name,
+      nutri: req.body.plus,
+      ingre: req.body.ingre,
+    };
+
+    const saveRecipe = new Domo(recipe);
+
+    await saveRecipe.save();
+
     return res.status(201).json({
       message: 'The Image/Recipe was sucessfully uploaded',
     });

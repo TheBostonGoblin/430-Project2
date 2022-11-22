@@ -24,12 +24,13 @@ const getAllPost = (req, res) => DomoModel.find({}, (err, docs) => {
     return res.stauts(400).json({ error: 'An error occured!' });
   }
 
-  docs.forEach((recipe) => {
-    recipe.hasLiked = recipe._doc.likedBy.includes(req.session.account.username);
-  });
+  const posts = docs;
+  for (let x = 0; x < posts.length; x++) {
+    posts[x].hasLiked = posts[x].likedBy.includes(req.session.account.username);
+  }
 
-  return res.json({ domos: docs });
-});
+  return res.json({ domos: posts });
+}).lean();
 
 const makePost = async (req, res) => {
   if (!req.body.dishName
@@ -45,9 +46,6 @@ const makePost = async (req, res) => {
     nutri: req.body.nutri,
     ingre: req.body.ingre,
     image: req.body.image,
-    likes: req.body.likes,
-    likedBy: [],
-    hasLiked: req.body.hasLiked,
     owner: req.session.account._id,
   };
 

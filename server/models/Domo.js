@@ -21,21 +21,18 @@ const DomoSchema = new mongoose.Schema({
     require: true,
   },
   image: {
-    type: Buffer,
-    contentType: String,
+    type: mongoose.Schema.ObjectId,
   },
   likes: {
     type: Number,
     require: true,
     min: 0,
+    default: 0,
   },
   likedBy: {
     type: Array,
     require: true,
-  },
-  hasLiked: {
-    type: Boolean,
-    require: true,
+    default: [],
   },
   owner: {
     type: mongoose.Schema.ObjectId,

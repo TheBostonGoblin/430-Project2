@@ -9,6 +9,31 @@ const handleError = (message) => {
 };
 
 
+const uploadFile = async (e,handler) => {
+    e.preventDefault();
+
+    // dishName : dishName,
+    //     nutri: nutri,
+    //     ingre: ingre,
+    //     likes: likes,
+    //     likedBy: likedBy,
+    //     hasLiked: hasLiked,
+    //     csrf: _csrf
+
+    const response = await fetch(e.target.action,{
+        method: 'POST',
+        body: new FormData(e.target),
+    });
+
+    const result = await response.json();
+
+    if(handler){
+        handler(result);
+    }
+    console.log(result);
+    return false;
+};
+
 const sendPost = async (url, data, handler) => {
     const response = await fetch(url, {
         method: 'POST',
@@ -40,5 +65,6 @@ const hideError = () =>{
 module.exports = {
     handleError,
     sendPost,
-    hideError
+    hideError,
+    uploadFile
 }

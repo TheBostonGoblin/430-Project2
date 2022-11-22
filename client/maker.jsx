@@ -6,15 +6,7 @@ const handleUpload = (e) => {
     e.preventDefault();
     helper.hideError();
 
-    const file = e.target.querySelector('#sampleFile').files[0];
-    const _csrf = e.target.querySelector('#_csrf').value;
-
-    if (!file) {
-        helper.handleError("All fields are required!");
-        return false;
-    }
-
-    helper.sendPost(e.target.action, { file, _csrf });
+    helper.uploadFile(e,loadDomosFromServer);
     return false;
 
 }
@@ -80,6 +72,8 @@ const UploadForm = (props) => {
         encType="multipart/form-data">
         <input id="_csrf" type="hidden" name="_csrf" value={props.csrf} />
         <input id="sampleFile" type="file" name="sampleFile" />
+        <label htmlFor="name">Name: </label>
+        <input id="name" type="text" name="name" placeholder="Random Name" />
         <input type='submit' value='Upload!' />
     </form>);
 }
@@ -88,19 +82,20 @@ const DomoForm = (props) => {
         <div className="box">
             <form id="domoForm"
                 name="loginForm"
-                onSubmit={handlePost}
-                action="/maker"
+                onSubmit={handleUpload}
+                action="/upload"
                 method="POST"
                 className="domoForm"
+                encType="multipart/form-data"
             >
                 <label htmlFor="name">Dish Name: </label>
-                <input id="dishName" type="text" name="name" placeholder="Domo Name" />
+                <input id="dishName" type="text" name="name" placeholder="Dish Name" />
 
                 <label htmlFor="plus">Nutritional Pluses: </label>
                 <input id="nutriPlus" type="text" name="plus" />
 
-                <label htmlFor="ingredients">Dish Ingredients: </label>
-                <input id="dishIngre" type="text" name="ingredients" />
+                <label htmlFor="ingre">Dish Ingredients: </label>
+                <input id="dishIngre" type="text" name="ingre" />
 
                 <label htmlFor="image">Dish Image: </label>
                 <input type="file" name="image" id='image' />
@@ -130,12 +125,13 @@ const DomoList = (props) => {
 
     console.log(props);
     const domoNodes = props.domos.map(domo => {
+        const imageSRC = domo.image?`/retrieve?_id=${domo.image}`:"/assets/img/recipePlaceholder.png"
         return (
             <div key={domo._id} className="domo card card-equal-height column is-4">
 
                 <div className='card-image'>
                     <figure className="image is-square ">
-                        <img src="/assets/img/recipePlaceholder.png" alt="domo face" className="recipeImage" />
+                        <img src={imageSRC} alt="domo face" className="recipeImage" />
                     </figure>
                 </div>
 

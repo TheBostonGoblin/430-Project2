@@ -5,6 +5,7 @@ const router = (app) => {
   app.get('/getToken', mid.requiresSecure, controllers.Account.getToken);
   app.get('/getMyPost', mid.requiresLogin, controllers.Domo.getMyPost);
   app.get('/getAllPosts', mid.requiresLogin, controllers.Domo.getAllPost);
+  app.get('/retrieve', controllers.fileControl.retrieveFile)
 
   app.get('/login', mid.requiresSecure, mid.requiresLogout, controllers.Account.loginPage);
   app.post('/login', mid.requiresSecure, mid.requiresLogout, controllers.Account.login);
