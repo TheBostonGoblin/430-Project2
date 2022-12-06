@@ -146,7 +146,7 @@ const router = (app) => {
   app.post('/aMember', mid.requiresLogin, controllers.Account.activateMemebership);
 
   /*
-    URL: /aMember
+    URL: /deMember
     Supported Methods: POST
     Middleware: Requires Login
     Query Params: None
@@ -156,7 +156,7 @@ const router = (app) => {
   app.post('/deMember', mid.requiresLogin, controllers.Account.deActivateMemebership);
 
   /*
-    URL: /aMember
+    URL: /profile
     Supported Methods: GET
     Middleware: Requires Login
     Query Params: None
