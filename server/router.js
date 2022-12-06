@@ -207,14 +207,23 @@ const router = (app) => {
 
   /*
       URL: /
-      Supported Methods: POST
+      Supported Methods: GET
       Middleware: Requires Login & Requires Secure
       Query Params: None
       Description: logs the user our ends the session and takes the user back to the login page
       Return Type(s): JSON
     */
-
   app.get('/', mid.requiresSecure, mid.requiresLogout, controllers.Account.loginPage);
+
+  /*
+      URL: /*
+      Supported Methods: Get
+      Middleware: None
+      Query Params: None
+      Description: Handles if the user attempts to go to a place that does not exist.
+      Return Type(s): JSON
+    */
+  app.get('/*', controllers.Account.notfound);
 };
 
 module.exports = router;

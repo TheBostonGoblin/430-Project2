@@ -7,7 +7,7 @@ const { Account } = models;
 // rendering the login page nad the signup page
 const loginPage = (req, res) => res.render('login', { csrfToken: req.csrfToken() });
 const signupPage = (req, res) => res.render('signup', { csrfToken: req.csrfToken() });
-
+const notfound = (req, res) => res.render('notfound');
 // logout function
 const logout = (req, res) => {
   req.session.destroy();
@@ -155,4 +155,5 @@ module.exports = {
   updatePass,
   activateMemebership,
   deActivateMemebership,
+  notfound,
 };
