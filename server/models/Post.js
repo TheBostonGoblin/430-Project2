@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 const _ = require('underscore');
 
-let DomoModel = {};
+let PostModel = {};
 
 const setName = (dishName) => _.escape(dishName).trim();
 
-const DomoSchema = new mongoose.Schema({
+// below is all the data nessary to create a post
+const PostSchema = new mongoose.Schema({
   dishName: {
     type: String,
     require: true,
@@ -34,6 +35,11 @@ const DomoSchema = new mongoose.Schema({
     require: true,
     default: [],
   },
+  whoCreated: {
+    type: String,
+    require: true,
+    default: 'no owner',
+  },
   owner: {
     type: mongoose.Schema.ObjectId,
     require: true,
@@ -45,7 +51,7 @@ const DomoSchema = new mongoose.Schema({
   },
 });
 
-DomoSchema.static.toAPI = (doc) => ({
+PostSchema.static.toAPI = (doc) => ({
   dishName: doc.dishName,
   nutri: doc.nutri,
   ingre: doc.ingre,
@@ -53,16 +59,17 @@ DomoSchema.static.toAPI = (doc) => ({
   likes: doc.likes,
   likedBy: doc.likedBy,
   hasLiked: doc.hasLiked,
+  whoCreated: doc.whoCreated,
 });
 
-DomoSchema.statics.findByOwner = (ownerId, callback) => {
+PostSchema.statics.findByOwner = (ownerId, callback) => {
   const search = {
     owner: mongoose.Types.ObjectId(ownerId),
   };
 
-  return DomoModel.find(search).select('dishName nutri ingre image likes likedBy hasLiked').lean().exec(callback);
+  return PostModel.find(search).select('whoCreated dishName nutri ingre image likes likedBy hasLiked').lean().exec(callback);
 };
 
-DomoModel = mongoose.model('Domo', DomoSchema);
+PostModel = mongoose.model('Post', PostSchema);
 
-module.exports = DomoModel;
+module.exports = PostModel;

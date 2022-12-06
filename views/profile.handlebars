@@ -10,27 +10,49 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
 
-<body>
-  <nav class="navbar">
-    <div class="navbar-menu " id="nav-links">
-      <figure class="image is-64x64">
-        <a href="/login"><img id="logo" src="/assets/img/eat.png" alt="face logo" /></a>
+<body id="profileBG">
+  <nav class="navbar is-primary">
+
+
+    <!-- -->
+    <div class="navbar-logo navbar-start">
+      <figure class="image is-96x96 p-3">
+        <img id="logo" src="/assets/img/favicon.png" alt="logo" />
       </figure>
-    
-    <div class="navlink"><a class="button is-warning" href="/logout">Log out</a></div>
-    <div class="navlink"><a class="button is-primary" href="/maker">Maker</a></div>
+        <h1 class="is-vcentered title navbar-item is-black">Gobble!</h1>
+    </div>
+
+    <div class="navbar-menu" id="nav-links">
+      <div class="navbar-end">
+        <div class="navlink m-2"><a id="btn" class="button is-warning navbar-item is-large" href="/maker">Posts</a></div>
+        <div class="navlink m-2"><a id="btn" class="button is-danger navbar-item is-large" href="/logout">Log out</a></div>
+      </div>
     </div>
   </nav>
 
-  <section id="domos" class="container">
+<div id="profileGenForms" class="container box mt-3">
+
+  <div class="welcome has-text-centered">
+    
+  </div>
+
+<!--Where memberhip form is created-->
+  <div id="membership" class="container box mt-2">
+
+  </div>
+<!--Where password change form is created-->
+  <div id="changePass">
+
+  </div>
+
+  
+
+
+</div>
+  <!--Where post are loaded in-->
+  <section id="posts" class="container">
 
   </section>
-
-  <div id="domoMessage" class='hidden'>
-    <img id="speech" src="/assets/img/speech.png" alt="speech box" />
-    <h3><span id="errorMessage"></span></h3>
-    <img id="domo" src="assets/img/domo.png" alt="domo" />
-  </div>
 
   
   <script src="/socket.io/socket.io.js"></script>

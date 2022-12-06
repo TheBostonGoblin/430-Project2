@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+// seperate model used in storing images but used in tendem with post model to create recipe post
 const FileSchema = new mongoose.Schema({
 
   name: {

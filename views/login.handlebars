@@ -1,27 +1,47 @@
 <html lang="en">
+
 <head>
-  <meta charset="utf-8"/>
+  <meta charset="utf-8" />
   <title>DomoMaker</title>
   <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-  <link rel="shortcut icon" href="/assets/img/favicon.png"/>
-  <link rel="stylesheet" type="text/css" href="/assets/style.css"/>
+  <link rel="shortcut icon" href="/assets/img/favicon.png" />
+  <link rel="stylesheet" type="text/css" href="/assets/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
-<body> 
-  <nav><a href="/login"><img id="logo" src="/assets/img/face.png" alt="face logo"/></a>
-    <div class="navlink"><a id="loginButton" href="/login">Login</a></div>
-    <div class="navlink"><a id="signupButton" href="/signup">Sign up</a></div>
-  </nav>
-  
-  <section id="content">
 
-  </section>
+<body id="loginBG" class="is-vcentered">
 
-  <div id="domoMessage" class='hidden'>
-    <img id="speech" src="/assets/img/speech.png" alt="speech box"/>
-    <h3><span id="errorMessage"></span></h3>
-    <img id="domo" src="assets/img/domo.png" alt="domo"/>
+  <div class="bg-image">
+
   </div>
+
+  <div id="loginBox" class="container is-centered is-vcentered">
+    <div class="box columns is-multiline is-centered">
+
+      <h1 class="title is-centered">Welcome to Gobble!</h1>
+
+
+      <figure class="column is-12 is-centered has-text-centered">
+        <img class="image is-centered has-text-centered" id="loginLogo" src="/assets/img/favicon.png" alt="face logo" />
+      </figure>
+
+<!--Where login form is created-->
+      <section id="content" class="column is-12">
+
+      </section>
+
+<!--notify the user of an error-->
+      <div id="jsonMessage" class="column is-12 subtitle has-text-centered has-text-danger has-text-weight-bold">
+
+      </div>
+
+      <h2 class="subtitle column is-12">Dont have an account? Make One By Hitting The Button Below</h2>
+      <a class="button is-medium is-primary column is-12" id="signupButton" href="/signup">Sign up</a>
+    </div>
+  </div>
+
   <script src="/assets/loginBundle.js"></script>
 </body>
+
 </html>

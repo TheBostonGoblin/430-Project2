@@ -1,15 +1,15 @@
 const helper = require('./helper.js');
 
+//helper functions handle login request
 const handleLogin = (e) => {
     e.preventDefault();
-    helper.hideError();
 
     const username = e.target.querySelector('#user').value;
     const pass = e.target.querySelector("#pass").value;
     const _csrf = e.target.querySelector("#_csrf").value;
 
     if (!username || !pass) {
-        helper.handleError('Username or password is empty!');
+        helper.handleJsonMessage('Username or password is empty!');
         return false;
     }
 
@@ -18,30 +18,7 @@ const handleLogin = (e) => {
     return false;
 }
 
-const handleSignup = (e) => {
-    e.preventDefault();
-    helper.hideError();
-
-    const username = e.target.querySelector('#user').value;
-    const pass = e.target.querySelector("#pass").value;
-    const pass2 = e.target.querySelector("#pass2").value;
-    const _csrf = e.target.querySelector("#_csrf").value;
-
-    if (!username || !pass || !pass2) {
-        helper.handleError('All fields are required!');
-        return false;
-    }
-
-    if (pass !== pass2) {
-        helper.handleError('Passwords do not match!');
-        return false;
-    }
-
-    helper.sendPost(e.target.action, { username, pass, pass2, _csrf });
-
-    return false;
-}
-
+//creates the login form
 const LoginWindow = (props) => {
     return (
         <form id="loginForm"
@@ -49,61 +26,26 @@ const LoginWindow = (props) => {
             onSubmit={handleLogin}
             action="/login"
             method="POST"
-            className="mainForm"
+            className="mainForm is-centered"
         >
-            <label htmlFor="username">Username: </label>
-            <input id="user" type="text" name="username" placeholder="username" />
-            <label htmlFor="pass">Password: </label>
-            <input id="pass" type="text" name="pass" placeholder="password" />
+
+            <h1 className="column is-12 is-size-4 has-text-weight-bold">Login</h1>
+
+
+            <label className="label" htmlFor="username">Username: </label>
+            <input className="input" id="user" type="text" name="username" placeholder="Username" />
+            <label className="label" htmlFor="pass">Password: </label>
+            <input className="input mb-2" id="pass" type="password" name="pass" placeholder="Password" />
             <input id="_csrf" type="hidden" name="_csrf" value={props.csrf} />
-            <input className='formSubmit' type="submit" value="Sign in" />
+            <input className='formSubmit button is-primary is-centered' type="submit" value="Sign in" />
         </form>
     );
 }
 
-const SignupWindow = (props) => {
-    return (
-        <form id="signupForm"
-            name="signupForm"
-            onSubmit={handleSignup}
-            action="/signup"
-            method="POST"
-            className="mainForm"
-        >
-            <label htmlFor="username">Username: </label>
-            <input id="user" type="text" name="username" placeholder="username" />
-            <label htmlFor="pass">Password: </label>
-            <input id="pass" type="text" name="pass" placeholder="password" />
-            <label htmlFor="pass2">Password Retype: </label>
-            <input id="pass2" type="text" name="pass2" placeholder="retype password" />
-            <input id="_csrf" type="hidden" name="_csrf" value={props.csrf} />
-            <input className='formSubmit' type="submit" value="Sign in" />
-        </form>
-    );
-}
-
+//inital function
 const init = async () => {
     const response = await fetch('/getToken');
     const data = await response.json();
-
-    const loginButton = document.querySelector("#loginButton");
-    const signupButton = document.querySelector("#signupButton");
-
-    loginButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        ReactDOM.render(<LoginWindow csrf={data.csrfToken} />,
-            document.querySelector('#content')
-        );
-        return false;
-    });
-
-    signupButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        ReactDOM.render(<SignupWindow csrf={data.csrfToken} />,
-            document.querySelector('#content')
-        );
-        return false;
-    });
 
     ReactDOM.render(
         <LoginWindow csrf={data.csrfToken} />,

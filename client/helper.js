@@ -1,25 +1,14 @@
-// const socket = io();
 
-// const handleSocket = () =>{
-
-// }
-const handleError = (message) => {
-    document.getElementById('errorMessage').textContent = message;
-    document.getElementById('domoMessage').classList.remove('hidden');
-};
-
-
-const uploadFile = async (e,handler) => {
+//helper function used to used to tell the user that their is a error or message that needs to be communicated
+const handleJsonMessage = (message) =>{
+    document.getElementById('jsonMessage').textContent = message;
+}
+const handleJsonMessageUp = (message) =>{
+    document.getElementById('jsonMessageUpdate').textContent = message;
+}
+const updateUploadFile = async (e,handler) => {
     e.preventDefault();
-
-    // dishName : dishName,
-    //     nutri: nutri,
-    //     ingre: ingre,
-    //     likes: likes,
-    //     likedBy: likedBy,
-    //     hasLiked: hasLiked,
-    //     csrf: _csrf
-
+    
     const response = await fetch(e.target.action,{
         method: 'POST',
         body: new FormData(e.target),
@@ -27,10 +16,33 @@ const uploadFile = async (e,handler) => {
 
     const result = await response.json();
 
+    if (result.error) {
+        handleJsonMessageUp(result.error);
+    }
+
     if(handler){
         handler(result);
     }
-    console.log(result);
+    return false;
+};
+
+const uploadFile = async (e,handler) => {
+    e.preventDefault();
+    
+    const response = await fetch(e.target.action,{
+        method: 'POST',
+        body: new FormData(e.target),
+    });
+
+    const result = await response.json();
+
+    if (result.error) {
+        handleJsonMessage(result.error);
+    }
+
+    if(handler){
+        handler(result);
+    }
     return false;
 };
 
@@ -44,10 +56,9 @@ const sendPost = async (url, data, handler) => {
     });
 
     const result = await response.json();
-    document.getElementById('domoMessage').classList.add('hidden');
 
     if (result.error) {
-        handleError(result.error);
+        handleJsonMessage(result.error);
     }
 
     if (result.redirect) {
@@ -59,12 +70,32 @@ const sendPost = async (url, data, handler) => {
     }
 };
 
-const hideError = () =>{
-    document.querySelector("#domoMessage").classList.add('hidden');
+const sendSub = async (url,data,handler) =>{
+
+    console.log("Entered send sub");
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+
+    console.log("exit send sub");
+
+    const result = await response.json();
+
+    if(handler){
+        handler(result);
+    }
+    return false;
 }
+
 module.exports = {
-    handleError,
     sendPost,
-    hideError,
-    uploadFile
+    uploadFile,
+    sendSub,
+    handleJsonMessage,
+    updateUploadFile,
+    handleJsonMessageUp,
 }

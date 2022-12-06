@@ -1,6 +1,7 @@
 const http = require('http');
 const { Server } = require('socket.io');
 
+// setup nesssary for socket IO fucntionality
 let io = null;
 
 const warp = (middleware) => (socket, next) => middleware(socket.request, {}, next);

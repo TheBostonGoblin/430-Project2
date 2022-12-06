@@ -1,0 +1,34 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>DomoMaker</title>
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <link rel="shortcut icon" href="/assets/img/favicon.png"/>
+  <link rel="stylesheet" type="text/css" href="/assets/style.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+</head>
+<body id="signupBG"> 
+  
+  <div id="signupBox" class="container is-centered is-vcentered p-3">
+    <div class="box columns is-multiline is-centered pt-6">
+
+      <h1 class="title is centered">Register Now!</h1>
+
+<!--Where signup form is created-->
+      <section id="content" class="column is-12">
+
+      </section>
+
+<!--Where post form is created-->
+      <div id="jsonMessage" class="column is-12 subtitle has-text-centered has-text-danger" >
+
+      </div>
+
+      <h2 class="subtitle column is-12">Already Have An Account? Great! Go Back And Login</h2>
+      <a class="button is-medium is-primary column is-12" id="signupButton" href="/login">Login</a>
+    </div>
+  </div>
+  <script src="/assets/signupBundle.js"></script>
+</body>
+</html>

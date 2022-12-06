@@ -2,103 +2,73 @@ const helper = require('./helper.js');
 let csrfToken;
 var socket = io();
 
+//helper function to handle uploading a post or creating a post
 const handleUpload = (e) => {
     e.preventDefault();
-    helper.hideError();
 
-    helper.uploadFile(e,loadDomosFromServer);
+    helper.uploadFile(e, loadPostsFromServer);
     return false;
 
 }
-const handlePost = (e) => {
+//helper function for handling post updates in this case just likes
+const handlePostUpdate = (e) => {
     e.preventDefault();
-    helper.hideError();
 
-    const dishName = e.target.querySelector('#dishName').value;
-    const nutri = e.target.querySelector('#nutriPlus').value;
-    const ingre = e.target.querySelector('#dishIngre').value;
-    const image = e.target.querySelector('#image').value;
-    const likes = e.target.querySelector('#likes').value;
-    const likedBy = e.target.querySelector('#likedBy').value;
-    const hasLiked = e.target.querySelector('#hasLiked').value;
-    const _csrf = e.target.querySelector('#_csrf').value;
-
-    if (!dishName || !nutri || !ingre || !image) {
-        helper.handleError("All fields are required!");
-        return false;
-    }
-
-
-    helper.sendPost(e.target.action, { dishName, nutri, ingre, image, likes, likedBy, hasLiked, _csrf }, loadDomosFromServer);
-    return false;
-}
-const handleUpdateDomo = (e) => {
-    e.preventDefault();
-    helper.hideError();
-
-    const domoID = e.target.querySelector("#domoId").value;
+    const postID = e.target.querySelector("#postID").value;
     const _csrf = e.target.querySelector("#_csrf").value;
 
-    if (!domoID) {
-        helper.handleError("unable to get domo Object");
+    if (!postID) {
+        helper.handleJsonMessage("unable to get post Object");
         return false;
     }
 
-    helper.sendPost(e.target.action, { domoID, _csrf }, loadDomosFromServer);
+    helper.sendPost(e.target.action, { postID, _csrf }, loadPostsFromServer);
     return false;
 }
 
-const handleDeleteDomo = (e) => {
+//handler function for delete post
+const handlePostDelete = (e) => {
     e.preventDefault();
-    helper.hideError();
 
-    const domoID = e.target.querySelector("#domoId").value;
+    const postID = e.target.querySelector("#postID").value;
     const _csrf = e.target.querySelector("#_csrf").value;
 
-    if (!domoID) {
-        helper.handleError("unable to get domo Object");
+    if (!postID) {
+        helper.handleJsonMessage("unable to get post Object");
         return false;
     }
 
-    helper.sendPost(e.target.action, { domoID, _csrf }, loadDomosFromServer);
+    helper.sendPost(e.target.action, { postID, _csrf }, loadPostsFromServer);
     return false;
 }
-const UploadForm = (props) => {
-    return (<form
-        id='uploadForm'
-        onSubmit={handleUpload}
-        action='/upload'
-        method='POST'
-        encType="multipart/form-data">
-        <input id="_csrf" type="hidden" name="_csrf" value={props.csrf} />
-        <input id="sampleFile" type="file" name="sampleFile" />
-        <label htmlFor="name">Name: </label>
-        <input id="name" type="text" name="name" placeholder="Random Name" />
-        <input type='submit' value='Upload!' />
-    </form>);
-}
-const DomoForm = (props) => {
+
+//form used to create post
+const PostForm = (props) => {
     return (
         <div className="box">
-            <form id="domoForm"
+            <form id="postForm"
                 name="loginForm"
                 onSubmit={handleUpload}
                 action="/upload"
                 method="POST"
-                className="domoForm"
+                className="postForm"
                 encType="multipart/form-data"
             >
-                <label htmlFor="name">Dish Name: </label>
-                <input id="dishName" type="text" name="name" placeholder="Dish Name" />
 
-                <label htmlFor="plus">Nutritional Pluses: </label>
-                <input id="nutriPlus" type="text" name="plus" />
+                <section className='has-text-centered'>
+                    <h1 className='title has-text-weight-bold'>Create Post Here!</h1>
+                </section>
+                <label className='label' htmlFor="name">Dish Name: </label>
+                <input className='input' id="dishName" type="text" name="dishName" placeholder="Dish Name" />
 
-                <label htmlFor="ingre">Dish Ingredients: </label>
-                <input id="dishIngre" type="text" name="ingre" />
+                <label className='label' htmlFor="plus">Nutritional Pluses: </label>
+                <input className='input' id="nutriPlus" type="text" name="plus" placeholder="Omega3's,Extra Vitamin C, etc..."/>
 
-                <label htmlFor="image">Dish Image: </label>
-                <input type="file" name="image" id='image' />
+                <label className='label' htmlFor="ingre">Dish Ingredients: </label>
+                <input className='input' id="dishIngre" type="text" name="ingre" placeholder="Apples,Lamb,Cumin..."/>
+
+                <label className='label' htmlFor="image">Dish Image: </label>
+                <input className='input' type="file" name="image" id='image' />
 
                 <input type="hidden" name='likes' value={0} id='likes' />
 
@@ -107,129 +77,210 @@ const DomoForm = (props) => {
                 <input type="hidden" name='hasliked' id='hasliked' value={false} />
 
                 <input id="_csrf" type="hidden" name="_csrf" value={props.csrf} />
-                <input className='makeDomoSubmit' type="submit" value="Make Domo" />
+                <input className='SubmitPostForm button is-info mt-2' type="submit" value="Make Post" />
+
+                <section id="jsonMessage" className="column is-12 subtitle has-text-centered has-text-danger has-text-weight-bold"></section>
             </form>
         </div>
 
     );
 }
 
-const DomoList = (props) => {
-    if (props.domos.length === 0) {
+//function used to load all in addition other forms for liking,and deleting post
+const PostList = (props) => {
+    if (props.posts.length === 0) {
         return (
-            <div className='domoList columns is-multiline'>
-                <h3 className="emptyDomo">No Domos Yet!</h3>
+            <div className='postList columns is-multiline'>
+                <h3 className="emptyDomo">No one has posted anything</h3>
             </div>
         )
     }
 
-    console.log(props);
-    const domoNodes = props.domos.map(domo => {
-        const imageSRC = domo.image?`/retrieve?_id=${domo.image}`:"/assets/img/recipePlaceholder.png"
+    const postNodes = props.posts.map(post => {
+        const imageSRC = post.image ? `/retrieve?_id=${post.image}` : "/assets/img/recipePlaceholder.png"
+
+        let likedByString = '';
+
+        for(let x = 0 ;x < post.likedBy.length;x++){
+            if((x+1) === (post.likedBy.length)){
+                likedByString += post.likedBy[x];
+            }
+            else{
+                likedByString += `${post.likedBy[x]},`;
+            }
+            
+        }
+
+        if(likedByString === undefined || likedByString === null || likedByString === ''){
+            likedByString = "No likes yet!"
+        }
+
+        
+        let deleteForm;
+        if(props.account.username ===  post.whoCreated){
+            deleteForm = <form
+                            id="deleteForm"
+                            name="deleteForm"
+                            onSubmit={handlePostDelete}
+                            action="/delete"
+                            method='POST'
+                            className='deleteForm column is-6'
+                        >
+                            <input id="_csrf" type="hidden" name="_csrf" value={csrfToken} />
+                            <input id="postID" type="hidden" name="postID" value={post._id} />
+                            <input className='deleteSubmit button is-danger' type="submit" value="Delete Post" />
+                        </form>
+        }
+        else{
+
+        }
+
+        let likeButton;
+        //first checks if the user has liked the post or not than it determines if the user owns the post and wether or not a delete form is also nessary
+        if (post.hasLiked) {
+
+            //if the delete form exist than adjust the buttons width accordingly before creating the form
+            if(deleteForm){
+                likeButton = <form
+                id="unlikeForm"
+                name="unlikeForm"
+                onSubmit={handlePostUpdate}
+                action="/unlike"
+                method='POST'
+                className='unlikeForm column is-6'
+            >
+                <input id="_csrf" type="hidden" name="_csrf" value={csrfToken} />
+                <input id="postID" type="hidden" name="postID" value={post._id} />
+                <input id="likeSubmit" className='likeSubmit button is-warning' type="submit" value="UnLike Post" />
+            </form>
+            }
+            else{
+                likeButton = <form
+                id="unlikeForm"
+                name="unlikeForm"
+                onSubmit={handlePostUpdate}
+                action="/unlike"
+                method='POST'
+                className='unlikeForm column is-12'
+            >
+                <input id="_csrf" type="hidden" name="_csrf" value={csrfToken} />
+                <input id="postID" type="hidden" name="postID" value={post._id} />
+                <input id="likeSubmit" className='likeSubmit button is-warning' type="submit" value="UnLike Post" />
+            </form>
+            }
+            
+        }
+        else {
+            if(deleteForm){
+            likeButton = <form
+                id="likeForm"
+                name="likeForm"
+                onSubmit={handlePostUpdate}
+                action="/like"
+                method='POST'
+                className='likeForm column is-6'
+            >
+                <input id="_csrf" type="hidden" name="_csrf" value={csrfToken} />
+                <input id="postID" type="hidden" name="postID" value={post._id} />
+                <input id="likeSubmit" className='likeSubmit button is-primary' type="submit" value="Like Post" />
+            </form>
+            }
+            else{
+                likeButton = <form
+                id="likeForm"
+                name="likeForm"
+                onSubmit={handlePostUpdate}
+                action="/like"
+                method='POST'
+                className='likeForm column is-12'
+            >
+                <input id="_csrf" type="hidden" name="_csrf" value={csrfToken} />
+                <input id="postID" type="hidden" name="postID" value={post._id} />
+                <input id="likeSubmit" className='likeSubmit button is-primary' type="submit" value="Like Post" />
+            </form>
+            }
+        }
+
+        //returns the approprate post depending on the user
         return (
-            <div key={domo._id} className="domo card card-equal-height column is-4">
+            <div key={post._id} className="post container column is-4 is-info p-0">
+                <div  className="card card-equal-height is-info m-2 p-2">
 
-                <div className='card-image'>
-                    <figure className="image is-square ">
-                        <img src={imageSRC} alt="domo face" className="recipeImage" />
-                    </figure>
+                    <div className='card-image'>
+                        <figure className="image is-square">
+                            <img src={imageSRC} alt="placeholder pic" className="recipeImage" />
+                        </figure>
+                    </div>
+
+                    <div className='card-content'>
+
+
+                        <h3 className="createdBy title has-text-centered"> By:{post.whoCreated} </h3>
+                        <h3 className="dishName title has-text-centered"> {post.dishName} </h3>
+                        <h3 className="dishNuritPlus subtitle has-text-centered"> Nutritional Plus: {post.nutri} </h3>
+                        <h3 className="dishIngredients subtitle has-text-centered"> Ingerdients: {post.ingre} </h3>
+                        <h3 className="likes subtitle has-text-centered" > Food Likes: {post.likes} </h3>
+                        <h3 className="likedBy subtitle has-text-centered" > Who Liked The Post: {`${likedByString}`} </h3>
+
+                    </div>
+
+                    <div className="columns">
+
+                        {likeButton}
+                        {deleteForm}
+                    </div>
+
+
                 </div>
-
-                <div className='card-content'>
-
-                    <h3 className="dishName title has-text-centered"> {domo.dishName} </h3>
-                    <h3 className="dishNuritPlus subtitle has-text-centered"> Nutritional Plus: {domo.nutri} </h3>
-                    <h3 className="dishIngredients subtitle has-text-centered"> Ingerdients: {domo.ingre} </h3>
-                    <h3 className="likes subtitle has-text-centered" > Food Likes: {domo.likes} </h3>
-                    <h3 className="likedBy subtitle has-text-centered" > Who Liked The Post: {domo.likedBy} </h3>
-
-                </div>
-
-                <div className="card-footer columns">
-                    <form
-                        id="likeForm"
-                        name="likeForm"
-                        onSubmit={handleUpdateDomo}
-                        action="/like"
-                        method='POST'
-                        className='likeForm column is-4'
-                    >
-                        <input id="_csrf" type="hidden" name="_csrf" value={csrfToken} />
-                        <input id="domoId" type="hidden" name="domoId" value={domo._id} />
-                        <input id="likeSubmit" className='likeSubmit button is-primary' type="submit" value="Like Post" disabled={domo.hasLiked} />
-                    </form>
-
-                    <form
-                        id="unlikeForm"
-                        name="unlikeForm"
-                        onSubmit={handleUpdateDomo}
-                        action="/unlike"
-                        method='POST'
-                        className='unlikeForm column is-4'
-                    >
-                        <input id="_csrf" type="hidden" name="_csrf" value={csrfToken} />
-                        <input id="domoId" type="hidden" name="domoId" value={domo._id} />
-                        <input id="likeSubmit" className='likeSubmit button is-warning' type="submit" value="UnLike Post" disabled={!domo.hasLiked} />
-                    </form>
-
-                    <form
-                        id="deleteForm"
-                        name="deleteForm"
-                        onSubmit={handleDeleteDomo}
-                        action="/delete"
-                        method='POST'
-                        className='deleteForm column is-4'
-                    >
-                        <input id="_csrf" type="hidden" name="_csrf" value={csrfToken} />
-                        <input id="domoId" type="hidden" name="domoId" value={domo._id} />
-                        <input className='deleteSubmit button is-danger' type="submit" value="Delete Domo" />
-                    </form>
-                </div>
-
-
             </div>
         )
     });
 
+    //loads the posts
     return (
-        <div className="domoList columns is-multiline">
-            {domoNodes}
+        <div className="postList columns is-multiline">
+            {postNodes}
         </div>
     );
 }
 
-const loadDomosFromServer = async () => {
+//renders the post from the server
+const loadPostsFromServer = async () => {
     const response = await fetch('/getAllPosts');
     const data = await response.json();
+    const response2 = await fetch('/getAccount');
+    const data2 = await response2.json();
 
     ReactDOM.render(
-        <DomoList domos={data.domos} />,
-        document.querySelector("#domos")
+        <PostList csrf={data.csrfToken} posts={data.posts} account={data2.account} />,
+        document.querySelector("#posts")
     );
+
 }
 
+//intial function. loading into the react code
 const init = async () => {
 
-    console.log(`socket is : ${socket}`);
+    //fetching data form the server for rendering forms and react components
     const response = await fetch('/getToken');
     const data = await response.json();
+
+    const response2 = await fetch('/getAccount');
+    const data2 = await response2.json();
     csrfToken = data.csrfToken;
+
+
     ReactDOM.render(
-        <DomoForm csrf={data.csrfToken} />,
-        document.querySelector("#makeDomo")
+        <PostForm csrf={data.csrfToken}/>,
+        document.querySelector("#createPosts")
     );
 
     ReactDOM.render(
-        <UploadForm csrf={data.csrfToken} />,
-        document.querySelector("#imageUpload")
+        <PostList csrf={data.csrfToken} posts={[]} account={data2.account}/>,
+        document.querySelector("#posts")
     )
 
-    ReactDOM.render(
-        <DomoList csrf={data.csrfToken} domos={[]} />,
-        document.querySelector("#domos")
-    )
-
-    loadDomosFromServer();
+    loadPostsFromServer();
 }
 
 window.onload = init;
