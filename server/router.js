@@ -223,7 +223,7 @@ const router = (app) => {
       Description: Handles if the user attempts to go to a place that does not exist.
       Return Type(s): JSON
     */
-  app.get('/*',mid.requiresSecure, controllers.Account.notfound);
+  app.get('/*', mid.requiresSecure, controllers.Account.notfound);
 };
 
 module.exports = router;

@@ -7,8 +7,8 @@ const { Account } = models;
 // rendering the login page nad the signup page
 const loginPage = (req, res) => res.render('login', { csrfToken: req.csrfToken() });
 const signupPage = (req, res) => res.render('signup', { csrfToken: req.csrfToken() });
-const notfound = (req, res) => res.render('notFound',{
-  page: req.url
+const notfound = (req, res) => res.render('notFound', {
+  page: req.url,
 });
 // logout function
 const logout = (req, res) => {
